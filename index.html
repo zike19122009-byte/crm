@@ -4,149 +4,42 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CRM · Follow-up de Rematrícula</title>
-<style>
-  :root{
-    --bg:#F5F6FA;
-    --surface:#FFFFFF;
-    --border:#E5E7EB;
-    --text:#1F2937;
-    --text-soft:#6B7280;
-    --accent:#4F46E5;
-    --accent-soft:#EEF2FF;
-    --radius:10px;
-    --shadow:0 1px 2px rgba(16,24,40,.06), 0 1px 3px rgba(16,24,40,.08);
-  }
-  *{box-sizing:border-box;}
-  body{
-    margin:0;
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    background:var(--bg);
-    color:var(--text);
-  }
-  /* ---------- Header ---------- */
-  header{
-    background:var(--surface);
-    border-bottom:1px solid var(--border);
-    padding:14px 20px;
-    position:sticky; top:0; z-index:20;
-  }
-  .header-top{
-    display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;
-  }
-  .brand{display:flex; align-items:center; gap:10px;}
-  .brand .dot{width:10px;height:10px;border-radius:50%;background:var(--accent);}
-  .brand h1{font-size:16px; margin:0; font-weight:700; letter-spacing:-.2px;}
-  .brand .sub{font-size:12px; color:var(--text-soft);}
-  .header-actions{display:flex; gap:8px; flex-wrap:wrap; align-items:center;}
-  .toolbar{
-    display:flex; gap:8px; margin-top:12px; flex-wrap:wrap; align-items:center;
-  }
-  .toolbar .grp{display:flex; align-items:center; gap:6px; background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:4px 8px;}
-  .toolbar label{font-size:11px; color:var(--text-soft); font-weight:600; text-transform:uppercase; letter-spacing:.03em;}
-  select, input[type=text], input[type=search], input[type=tel], input[type=email], textarea{
-    font-family:inherit; font-size:13px; border:1px solid var(--border); border-radius:7px;
-    padding:7px 9px; background:var(--surface); color:var(--text); outline:none;
-  }
-  select:focus, input:focus, textarea:focus{border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft);}
-  .toolbar select, .toolbar input{border:none; background:transparent; padding:2px 4px; font-size:13px;}
-  .search-box{display:flex; align-items:center; gap:6px; background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:6px 10px; min-width:220px;}
-  .search-box input{flex:1; border:none; background:transparent;}
-  button{
-    font-family:inherit; cursor:pointer; border:none; border-radius:8px; padding:8px 14px;
-    font-size:13px; font-weight:600; transition:.15s ease;
-  }
-  .btn-primary{background:var(--accent); color:#fff;}
-  .btn-primary:hover{background:#4338CA;}
-  .btn-ghost{background:var(--surface); color:var(--text); border:1px solid var(--border);}
-  .btn-ghost:hover{background:var(--bg);}
-  .btn-sm{padding:5px 10px; font-size:12px; border-radius:6px;}
-  .btn-danger{background:#FEF2F2; color:#DC2626;}
-  .btn-danger:hover{background:#FEE2E2;}
-  .chip-toggle{
-    display:flex; align-items:center; gap:6px; font-size:12px; font-weight:600; color:var(--text-soft);
-    cursor:pointer; user-select:none; background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:6px 10px;
-  }
-  .chip-toggle.active{background:var(--accent-soft); color:var(--accent); border-color:#C7D2FE;}
-
-  /* ---------- Stats ---------- */
-  .stats-bar{
-    display:flex; gap:10px; padding:12px 20px; overflow-x:auto; background:var(--surface); border-bottom:1px solid var(--border);
-  }
-  .stat-card{
-    flex:0 0 auto; min-width:130px; background:var(--bg); border:1px solid var(--border); border-radius:9px; padding:8px 12px;
-  }
-  .stat-card .n{font-size:19px; font-weight:800; line-height:1.1;}
-  .stat-card .l{font-size:11px; color:var(--text-soft); margin-top:2px; font-weight:600;}
-
-  /* ---------- Board ---------- */
-  #board{
-    display:flex; gap:14px; padding:16px 20px 40px; overflow-x:auto; align-items:flex-start;
-  }
-  .column{
-    flex:0 0 268px; background:#EEF0F5; border-radius:12px; padding:10px; min-height:120px;
-  }
-  .column.dragover{outline:2px dashed var(--accent); outline-offset:-4px; background:#E4E7F5;}
-  .col-head{display:flex; align-items:center; justify-content:space-between; padding:4px 6px 10px;}
-  .col-head .title{display:flex; align-items:center; gap:7px; font-size:12.5px; font-weight:700;}
-  .col-dot{width:8px;height:8px;border-radius:50%;}
-  .col-count{font-size:11px; background:var(--surface); border-radius:20px; padding:1px 8px; font-weight:700; color:var(--text-soft);}
-  .cards{display:flex; flex-direction:column; gap:8px; min-height:40px;}
-  .card{
-    background:var(--surface); border-radius:9px; padding:10px 11px; box-shadow:var(--shadow);
-    cursor:grab; border:1px solid transparent;
-  }
-  .card:active{cursor:grabbing;}
-  .card:hover{border-color:var(--accent);}
-  .card .name{font-size:13px; font-weight:700; margin-bottom:3px;}
-  .card .meta-line{font-size:11.5px; color:var(--text-soft); display:flex; align-items:center; gap:5px; margin-top:2px;}
-  .card .tags{display:flex; gap:5px; flex-wrap:wrap; margin-top:6px;}
-  .tag{font-size:10px; font-weight:700; background:var(--accent-soft); color:var(--accent); border-radius:5px; padding:2px 6px;}
-  .tag.gray{background:#F3F4F6; color:#4B5563;}
-  .card .foot{display:flex; align-items:center; justify-content:space-between; margin-top:8px; gap:6px;}
-  .card select{font-size:11px; padding:3px 5px; flex:1;}
-  .card .notes-badge{font-size:11px; color:var(--text-soft); white-space:nowrap;}
-  .empty-col{font-size:11.5px; color:#9CA3AF; text-align:center; padding:16px 6px;}
-
-  /* ---------- Modal ---------- */
-  .overlay{
-    position:fixed; inset:0; background:rgba(17,24,39,.45); display:none; align-items:flex-start; justify-content:center;
-    padding:40px 16px; overflow-y:auto; z-index:100;
-  }
-  .overlay.open{display:flex;}
-  .modal{
-    background:var(--surface); border-radius:14px; width:100%; max-width:520px; padding:22px; box-shadow:0 20px 50px rgba(0,0,0,.25);
-  }
-  .modal h2{margin:0 0 4px; font-size:17px;}
-  .modal .close{float:right; background:none; border:none; font-size:18px; color:var(--text-soft); cursor:pointer; padding:2px 6px;}
-  .field{margin-bottom:12px;}
-  .field label{display:block; font-size:11.5px; font-weight:700; color:var(--text-soft); margin-bottom:4px; text-transform:uppercase; letter-spacing:.03em;}
-  .field input, .field select, .field textarea{width:100%;}
-  .field textarea{resize:vertical; min-height:60px;}
-  .row-2{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
-  .modal-actions{display:flex; justify-content:space-between; margin-top:16px; gap:8px;}
-  .meta-grid{display:grid; grid-template-columns:1fr 1fr; gap:6px 14px; font-size:12px; color:var(--text-soft); background:var(--bg); border-radius:8px; padding:10px; margin-bottom:14px;}
-  .meta-grid b{color:var(--text);}
-  .notes-list{max-height:180px; overflow-y:auto; display:flex; flex-direction:column; gap:8px; margin-bottom:8px;}
-  .note-item{background:var(--bg); border-radius:8px; padding:8px 10px; font-size:12.5px;}
-  .note-item .note-meta{font-size:10.5px; color:var(--text-soft); margin-bottom:3px; font-weight:600;}
-  .contact-links{display:flex; gap:8px; margin-bottom:10px;}
-  .contact-links a{font-size:12px; color:var(--accent); text-decoration:none; font-weight:600;}
-  .contact-links a:hover{text-decoration:underline;}
-
-  .toast{
-    position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#111827; color:#fff;
-    padding:10px 18px; border-radius:8px; font-size:13px; box-shadow:0 8px 24px rgba(0,0,0,.25); z-index:200;
-    opacity:0; pointer-events:none; transition:opacity .25s ease, transform .25s ease;
-  }
-  .toast.show{opacity:1; transform:translateX(-50%) translateY(-6px);}
-
-  @media (max-width:640px){
-    .column{flex:0 0 84vw;}
-    .row-2{grid-template-columns:1fr;}
-  }
-</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<link rel="stylesheet" href="Style.css"> 
 </head>
 <body>
+
+<!-- ============ TELA DE LOGIN / CADASTRO ============ -->
+<div id="authScreen">
+  <div class="auth-card">
+    <div class="brand"><span class="dot"></span><h1>CRM · Rematrícula</h1></div>
+    <div class="sub">Acesse com sua conta de colaborador</div>
+
+    <div class="auth-tabs">
+      <div class="auth-tab active" data-authtab="login">Entrar</div>
+      <div class="auth-tab" data-authtab="signup">Criar conta</div>
+    </div>
+
+    <div class="auth-error" id="authError"></div>
+    <div class="auth-msg" id="authMsg"></div>
+
+    <form class="auth-form active" id="formLogin">
+      <div class="field"><label>Email</label><input type="email" id="loginEmail" required></div>
+      <div class="field"><label>Senha</label><input type="password" id="loginSenha" required></div>
+      <button type="submit" class="btn-primary">Entrar</button>
+    </form>
+
+    <form class="auth-form" id="formSignup">
+      <div class="field"><label>Seu nome</label><input type="text" id="suNome" required></div>
+      <div class="field"><label>Email</label><input type="email" id="suEmail" required></div>
+      <div class="field"><label>Senha (mín. 6 caracteres)</label><input type="password" id="suSenha" minlength="6" required></div>
+      <button type="submit" class="btn-primary">Criar conta</button>
+    </form>
+  </div>
+</div>
+
+<!-- ============ APP (só aparece logado) ============ -->
+<div id="authApp">
 
 <header>
   <div class="header-top">
@@ -158,19 +51,20 @@
       </div>
     </div>
     <div class="header-actions">
-      <button class="btn-ghost" id="btnManageColab">Colaboradores</button>
+      <div class="user-badge">👤 <span id="meNome"></span> <span class="role-chip" id="meRole">user</span></div>
+      <button class="btn-ghost" id="btnManageColab">Equipe</button>
       <button class="btn-ghost" id="btnExport">Exportar CSV</button>
       <button class="btn-ghost" id="btnImport">Importar CSV</button>
       <button class="btn-primary" id="btnAddContact">+ Novo contato</button>
+      <button class="btn-ghost" id="btnLogout">Sair</button>
     </div>
   </div>
 
   <div class="toolbar">
-    <div class="grp">
-      <label>Você é</label>
-      <select id="selCurrentUser"></select>
+    <div class="tabs">
+      <button class="tab-btn active" id="tabBoard" data-tab="board">Meu quadro</button>
+      <button class="tab-btn" id="tabTable" data-tab="table">Todos os atendimentos</button>
     </div>
-    <div class="chip-toggle" id="toggleMine">Somente meus contatos</div>
     <div class="grp">
       <label>Ver de</label>
       <select id="selFilterColab"><option value="__todos__">Todos</option></select>
@@ -184,12 +78,16 @@
 <div class="stats-bar" id="statsBar"></div>
 
 <div id="board"></div>
+<div id="tableWrap" style="display:none;"></div>
+
+</div>
 
 <!-- ===== Modal: Contato (detalhe/edição) ===== -->
 <div class="overlay" id="overlayContact">
   <div class="modal">
     <button class="close" data-close="overlayContact">✕</button>
     <h2 id="cName">Nome</h2>
+    <div class="readonly-banner" id="cReadonlyBanner" style="display:none;">👀 Você pode visualizar este atendimento, mas só o responsável (ou o administrador) pode editá-lo.</div>
     <div class="contact-links" id="cLinks"></div>
     <div class="meta-grid" id="cMetaGrid"></div>
 
@@ -217,13 +115,15 @@
     <div class="field">
       <label>Anotações</label>
       <div class="notes-list" id="notesList"></div>
-      <textarea id="noteInput" placeholder="Escreva uma anotação sobre esse contato..."></textarea>
-      <div style="margin-top:6px;">
-        <button class="btn-primary btn-sm" id="btnAddNote">Adicionar anotação</button>
+      <div id="noteAddBox">
+        <textarea id="noteInput" placeholder="Escreva uma anotação sobre esse contato..."></textarea>
+        <div style="margin-top:6px;">
+          <button class="btn-primary btn-sm" id="btnAddNote">Adicionar anotação</button>
+        </div>
       </div>
     </div>
 
-    <div class="modal-actions">
+    <div class="modal-actions" id="cActions">
       <button class="btn-danger btn-sm" id="btnDeleteContact">Excluir contato</button>
       <button class="btn-primary btn-sm" id="btnSaveContact">Salvar alterações</button>
     </div>
@@ -272,593 +172,17 @@
   </div>
 </div>
 
-<!-- ===== Modal: Colaboradores ===== -->
+<!-- ===== Modal: Equipe ===== -->
 <div class="overlay" id="overlayColab">
   <div class="modal">
     <button class="close" data-close="overlayColab">✕</button>
-    <h2>Colaboradores</h2>
-    <div class="field">
-      <label>Adicionar colaborador</label>
-      <div style="display:flex; gap:8px;">
-        <input type="text" id="newColabName" placeholder="Nome do colaborador" style="flex:1;">
-        <button class="btn-primary btn-sm" id="btnAddColab">Adicionar</button>
-      </div>
-    </div>
+    <h2>Equipe</h2>
+    <p style="font-size:12.5px;color:var(--text-soft);margin-top:0;">Colaboradores cadastrados no sistema e quantos atendimentos cada um possui.</p>
     <div id="colabList" style="display:flex;flex-direction:column;gap:6px;"></div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
-
-<script>
-(function () {
-  'use strict';
-
-  // ---------- Config ----------
-  var STATUS_COLS = [
-    { id: 'nao_contatado',      label: 'Não Contatado',              color: '#9CA3AF' },
-    { id: 'contato_realizado',  label: 'Contato Realizado',          color: '#3B82F6' },
-    { id: 'sem_resposta',       label: 'Sem Resposta',               color: '#EAB308' },
-    { id: 'retornou_positivo',  label: 'Retornou · Interessado',     color: '#10B981' },
-    { id: 'retornou_negativo',  label: 'Retornou · Não Interessado', color: '#F97316' },
-    { id: 'rematriculado',      label: 'Rematriculado ✓',            color: '#059669' },
-    { id: 'perdido',            label: 'Perdido ✕',                  color: '#DC2626' }
-  ];
-  var STATUS_MAP = {};
-  STATUS_COLS.forEach(function (s) { STATUS_MAP[s.id] = s; });
-
-  var LS_CONTACTS = 'crm_contacts_v1';
-  var LS_COLAB = 'crm_colaboradores_v1';
-  var LS_USER = 'crm_current_user_v1';
-
-  // ---------- State ----------
-  var state = {
-    contacts: [],
-    colaboradores: [],
-    currentUser: '',
-    filterColaborador: '__todos__',
-    onlyMine: false,
-    search: '',
-    activeContactId: null
-  };
-
-  // ---------- Storage ----------
-  function loadState() {
-    try { state.contacts = JSON.parse(localStorage.getItem(LS_CONTACTS) || '[]'); } catch (e) { state.contacts = []; }
-    try { state.colaboradores = JSON.parse(localStorage.getItem(LS_COLAB) || '[]'); } catch (e) { state.colaboradores = []; }
-    state.currentUser = localStorage.getItem(LS_USER) || '';
-  }
-  function saveContacts() { localStorage.setItem(LS_CONTACTS, JSON.stringify(state.contacts)); }
-  function saveColaboradores() { localStorage.setItem(LS_COLAB, JSON.stringify(state.colaboradores)); }
-  function saveUser() { localStorage.setItem(LS_USER, state.currentUser); }
-
-  // ---------- Utils ----------
-  function uid() { return 'c_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8); }
-  function nowISO() { return new Date().toISOString(); }
-  function fmtDate(iso) {
-    if (!iso) return '';
-    var d = new Date(iso);
-    return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-  }
-  function esc(str) {
-    if (str === null || str === undefined) return '';
-    return String(str).replace(/[&<>"']/g, function (c) {
-      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
-    });
-  }
-  function onlyDigits(s) { return (s || '').replace(/\D/g, ''); }
-  function showToast(msg) {
-    var t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
-    clearTimeout(showToast._tm);
-    showToast._tm = setTimeout(function () { t.classList.remove('show'); }, 2600);
-  }
-
-  function ensureColaborador(name) {
-    name = (name || '').trim();
-    if (!name) return;
-    var exists = state.colaboradores.some(function (c) { return c.toLowerCase() === name.toLowerCase(); });
-    if (!exists) { state.colaboradores.push(name); saveColaboradores(); }
-  }
-
-  // ---------- CSV parsing ----------
-  function detectDelimiter(headerLine) {
-    var candidates = ['\t', ';', ','];
-    var best = ',', bestCount = -1;
-    candidates.forEach(function (d) {
-      var count = headerLine.split(d).length;
-      if (count > bestCount) { bestCount = count; best = d; }
-    });
-    return best;
-  }
-  function parseCSVLine(line, delim) {
-    var result = [], cur = '', inQuotes = false;
-    for (var i = 0; i < line.length; i++) {
-      var ch = line[i];
-      if (ch === '"') {
-        if (inQuotes && line[i + 1] === '"') { cur += '"'; i++; }
-        else { inQuotes = !inQuotes; }
-      } else if (ch === delim && !inQuotes) { result.push(cur); cur = ''; }
-      else { cur += ch; }
-    }
-    result.push(cur);
-    return result.map(function (s) { return s.trim(); });
-  }
-  function normalizeHeader(h) {
-    return h.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase()
-      .replace(/[^A-Z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
-  }
-  var HEADER_ALIASES = {
-    nome: ['NOME_ALUNO', 'NOME', 'ALUNO', 'CLIENTE', 'NAME'],
-    telefone: ['FONE', 'TELEFONE', 'CELULAR', 'WHATSAPP', 'PHONE', 'TEL'],
-    email: ['EMAIL', 'E_MAIL'],
-    curso: ['NOME_CURSO', 'CURSO'],
-    polo: ['NOME_POLO', 'POLO'],
-    tipo: ['TIPO'],
-    status_aluno: ['STATUS_ALUNO'],
-    turma: ['TURMA'],
-    codigo_aluno: ['CODIGO_ALUNO', 'CODIGO', 'MATRICULA']
-  };
-  function mapHeaders(rawHeaders) {
-    var norm = rawHeaders.map(normalizeHeader);
-    var map = {};
-    Object.keys(HEADER_ALIASES).forEach(function (field) {
-      var aliases = HEADER_ALIASES[field];
-      for (var i = 0; i < norm.length; i++) {
-        if (aliases.indexOf(norm[i]) !== -1) { map[field] = i; break; }
-      }
-    });
-    return map;
-  }
-  function parseCSV(text) {
-    var lines = text.split(/\r\n|\n|\r/).filter(function (l) { return l.trim().length > 0; });
-    if (lines.length === 0) return { rows: [], map: {}, error: 'Arquivo vazio.' };
-    var delim = detectDelimiter(lines[0]);
-    var headers = parseCSVLine(lines[0], delim);
-    var map = mapHeaders(headers);
-    if (map.nome === undefined || (map.telefone === undefined && map.email === undefined)) {
-      return { rows: [], map: map, error: 'Não encontrei colunas de nome e telefone/email no CSV.' };
-    }
-    var rows = [];
-    for (var i = 1; i < lines.length; i++) {
-      var cols = parseCSVLine(lines[i], delim);
-      if (cols.length < 2) continue;
-      var row = {
-        nome: map.nome !== undefined ? cols[map.nome] : '',
-        telefone: map.telefone !== undefined ? cols[map.telefone] : '',
-        email: map.email !== undefined ? cols[map.email] : '',
-        curso: map.curso !== undefined ? cols[map.curso] : '',
-        polo: map.polo !== undefined ? cols[map.polo] : '',
-        tipo: map.tipo !== undefined ? cols[map.tipo] : '',
-        status_aluno: map.status_aluno !== undefined ? cols[map.status_aluno] : '',
-        turma: map.turma !== undefined ? cols[map.turma] : '',
-        codigo_aluno: map.codigo_aluno !== undefined ? cols[map.codigo_aluno] : ''
-      };
-      if (row.nome) rows.push(row);
-    }
-    return { rows: rows, map: map, error: null };
-  }
-  function importRows(rows, colaborador) {
-    var added = 0, skipped = 0;
-    var existingKeys = {};
-    state.contacts.forEach(function (c) {
-      if (c.telefone) existingKeys['t:' + onlyDigits(c.telefone)] = true;
-      if (c.email) existingKeys['e:' + c.email.toLowerCase()] = true;
-    });
-    rows.forEach(function (r) {
-      var tKey = r.telefone ? 't:' + onlyDigits(r.telefone) : null;
-      var eKey = r.email ? 'e:' + r.email.toLowerCase() : null;
-      if ((tKey && existingKeys[tKey]) || (eKey && existingKeys[eKey])) { skipped++; return; }
-      var contact = {
-        id: uid(), nome: r.nome, telefone: r.telefone || '', email: r.email || '',
-        status: 'nao_contatado', colaborador: colaborador || '', notas: [],
-        criado_em: nowISO(), atualizado_em: nowISO(),
-        meta: { curso: r.curso || '', polo: r.polo || '', tipo: r.tipo || '', status_aluno: r.status_aluno || '', turma: r.turma || '', codigo_aluno: r.codigo_aluno || '' }
-      };
-      state.contacts.push(contact);
-      if (tKey) existingKeys[tKey] = true;
-      if (eKey) existingKeys[eKey] = true;
-      added++;
-    });
-    if (colaborador) ensureColaborador(colaborador);
-    saveContacts();
-    return { added: added, skipped: skipped };
-  }
-
-  // ---------- Derived / filters ----------
-  function getFilteredContacts() {
-    var q = state.search.trim().toLowerCase();
-    var mineFilter = state.onlyMine && state.currentUser;
-    return state.contacts.filter(function (c) {
-      if (mineFilter && c.colaborador !== state.currentUser) return false;
-      if (!mineFilter && state.filterColaborador !== '__todos__' && c.colaborador !== state.filterColaborador) return false;
-      if (q) {
-        var hay = (c.nome + ' ' + c.telefone + ' ' + c.email).toLowerCase();
-        if (hay.indexOf(q) === -1) return false;
-      }
-      return true;
-    });
-  }
-
-  // ---------- Rendering ----------
-  function renderSelects() {
-    // current user select
-    var selUser = document.getElementById('selCurrentUser');
-    var prevUser = state.currentUser;
-    selUser.innerHTML = '<option value="">Selecionar...</option>' +
-      state.colaboradores.map(function (c) { return '<option value="' + esc(c) + '">' + esc(c) + '</option>'; }).join('');
-    selUser.value = prevUser || '';
-
-    // filter select
-    var selFilter = document.getElementById('selFilterColab');
-    selFilter.innerHTML = '<option value="__todos__">Todos</option>' +
-      state.colaboradores.map(function (c) { return '<option value="' + esc(c) + '">' + esc(c) + '</option>'; }).join('');
-    selFilter.value = state.filterColaborador;
-
-    // colab select inside modals
-    ['cColab', 'nColab', 'iColab'].forEach(function (id) {
-      var el = document.getElementById(id);
-      var prev = el.value;
-      el.innerHTML = '<option value="">Não atribuído</option>' +
-        state.colaboradores.map(function (c) { return '<option value="' + esc(c) + '">' + esc(c) + '</option>'; }).join('');
-      el.value = prev;
-    });
-
-    // status select inside contact modal
-    var selStatus = document.getElementById('cStatus');
-    selStatus.innerHTML = STATUS_COLS.map(function (s) { return '<option value="' + s.id + '">' + esc(s.label) + '</option>'; }).join('');
-  }
-
-  function renderStats() {
-    var list = getFilteredContacts();
-    var total = list.length;
-    var html = '<div class="stat-card"><div class="n">' + total + '</div><div class="l">Contatos na visão atual</div></div>';
-    STATUS_COLS.forEach(function (s) {
-      var n = list.filter(function (c) { return c.status === s.id; }).length;
-      html += '<div class="stat-card"><div class="n" style="color:' + s.color + '">' + n + '</div><div class="l">' + esc(s.label) + '</div></div>';
-    });
-    document.getElementById('statsBar').innerHTML = html;
-  }
-
-  function contactCardHTML(c) {
-    var s = STATUS_MAP[c.status] || STATUS_COLS[0];
-    var tags = '';
-    if (c.meta && c.meta.curso) tags += '<span class="tag">' + esc(c.meta.curso) + '</span>';
-    if (c.meta && c.meta.tipo) tags += '<span class="tag gray">' + esc(c.meta.tipo) + '</span>';
-    var colabTag = c.colaborador ? '<span class="tag gray">👤 ' + esc(c.colaborador) + '</span>' : '<span class="tag gray">Não atribuído</span>';
-    var statusOptions = STATUS_COLS.map(function (st) {
-      return '<option value="' + st.id + '"' + (st.id === c.status ? ' selected' : '') + '>' + esc(st.label) + '</option>';
-    }).join('');
-    return '' +
-      '<div class="card" draggable="true" data-id="' + c.id + '">' +
-        '<div class="name">' + esc(c.nome) + '</div>' +
-        (c.telefone ? '<div class="meta-line">📞 ' + esc(c.telefone) + '</div>' : '') +
-        (c.email ? '<div class="meta-line">✉️ ' + esc(c.email) + '</div>' : '') +
-        '<div class="tags">' + colabTag + tags + '</div>' +
-        '<div class="foot">' +
-          '<select class="statusSelect" data-id="' + c.id + '">' + statusOptions + '</select>' +
-        '</div>' +
-        (c.notas && c.notas.length ? '<div class="notes-badge">📝 ' + c.notas.length + ' anotação(ões)</div>' : '') +
-      '</div>';
-  }
-
-  function renderBoard() {
-    var list = getFilteredContacts();
-    var board = document.getElementById('board');
-    board.innerHTML = STATUS_COLS.map(function (s) {
-      var items = list.filter(function (c) { return c.status === s.id; });
-      var cardsHTML = items.length
-        ? items.map(contactCardHTML).join('')
-        : '<div class="empty-col">Nenhum contato aqui</div>';
-      return '' +
-        '<div class="column" data-status="' + s.id + '">' +
-          '<div class="col-head">' +
-            '<div class="title"><span class="col-dot" style="background:' + s.color + '"></span>' + esc(s.label) + '</div>' +
-            '<div class="col-count">' + items.length + '</div>' +
-          '</div>' +
-          '<div class="cards" data-status="' + s.id + '">' + cardsHTML + '</div>' +
-        '</div>';
-    }).join('');
-    wireBoardEvents();
-  }
-
-  function renderAll() {
-    renderSelects();
-    renderStats();
-    renderBoard();
-  }
-
-  // ---------- Drag and drop ----------
-  function wireBoardEvents() {
-    document.querySelectorAll('.card').forEach(function (card) {
-      card.addEventListener('dragstart', function (e) {
-        e.dataTransfer.setData('text/plain', card.getAttribute('data-id'));
-      });
-      card.addEventListener('click', function (e) {
-        if (e.target.classList.contains('statusSelect')) return;
-        openContactModal(card.getAttribute('data-id'));
-      });
-    });
-    document.querySelectorAll('.statusSelect').forEach(function (sel) {
-      sel.addEventListener('click', function (e) { e.stopPropagation(); });
-      sel.addEventListener('change', function () {
-        updateContact(sel.getAttribute('data-id'), { status: sel.value });
-        renderAll();
-      });
-    });
-    document.querySelectorAll('.column').forEach(function (col) {
-      col.addEventListener('dragover', function (e) { e.preventDefault(); col.classList.add('dragover'); });
-      col.addEventListener('dragleave', function () { col.classList.remove('dragover'); });
-      col.addEventListener('drop', function (e) {
-        e.preventDefault();
-        col.classList.remove('dragover');
-        var id = e.dataTransfer.getData('text/plain');
-        updateContact(id, { status: col.getAttribute('data-status') });
-        renderAll();
-      });
-    });
-  }
-
-  function updateContact(id, patch) {
-    var c = state.contacts.find(function (x) { return x.id === id; });
-    if (!c) return;
-    Object.assign(c, patch);
-    c.atualizado_em = nowISO();
-    saveContacts();
-  }
-  function deleteContact(id) {
-    state.contacts = state.contacts.filter(function (x) { return x.id !== id; });
-    saveContacts();
-  }
-
-  // ---------- Contact modal ----------
-  function openContactModal(id) {
-    var c = state.contacts.find(function (x) { return x.id === id; });
-    if (!c) return;
-    state.activeContactId = id;
-    renderSelects();
-    document.getElementById('cName').textContent = c.nome;
-    document.getElementById('cStatus').value = c.status;
-    document.getElementById('cColab').value = c.colaborador || '';
-    document.getElementById('cPhone').value = c.telefone || '';
-    document.getElementById('cEmail').value = c.email || '';
-
-    var links = '';
-    if (c.telefone) {
-      var digits = onlyDigits(c.telefone);
-      links += '<a href="tel:' + digits + '">📞 Ligar</a>';
-      links += '<a href="https://wa.me/55' + digits + '" target="_blank" rel="noopener">💬 WhatsApp</a>';
-    }
-    if (c.email) links += '<a href="mailto:' + esc(c.email) + '">✉️ Email</a>';
-    document.getElementById('cLinks').innerHTML = links;
-
-    var m = c.meta || {};
-    var metaHTML = '';
-    [['Curso', m.curso], ['Polo', m.polo], ['Tipo', m.tipo], ['Status aluno', m.status_aluno], ['Turma', m.turma], ['Código', m.codigo_aluno]].forEach(function (pair) {
-      if (pair[1]) metaHTML += '<div><b>' + pair[0] + ':</b> ' + esc(pair[1]) + '</div>';
-    });
-    metaHTML += '<div><b>Criado em:</b> ' + fmtDate(c.criado_em) + '</div>';
-    metaHTML += '<div><b>Atualizado em:</b> ' + fmtDate(c.atualizado_em) + '</div>';
-    document.getElementById('cMetaGrid').innerHTML = metaHTML;
-
-    renderNotes(c);
-    document.getElementById('noteInput').value = '';
-    openOverlay('overlayContact');
-  }
-
-  function renderNotes(c) {
-    var list = (c.notas || []).slice().reverse();
-    var html = list.length ? list.map(function (n) {
-      return '<div class="note-item"><div class="note-meta">' + esc(n.autor || 'Sem autor') + ' · ' + fmtDate(n.data) + '</div>' + esc(n.texto) + '</div>';
-    }).join('') : '<div style="font-size:12px;color:var(--text-soft);">Nenhuma anotação ainda.</div>';
-    document.getElementById('notesList').innerHTML = html;
-  }
-
-  // ---------- Overlays ----------
-  function openOverlay(id) { document.getElementById(id).classList.add('open'); }
-  function closeOverlay(id) { document.getElementById(id).classList.remove('open'); }
-
-  // ---------- Init & events ----------
-  function init() {
-    loadState();
-    if (state.colaboradores.length === 0) {
-      ['Bianca', 'Laisy'].forEach(ensureColaborador);
-    }
-    renderAll();
-    bindEvents();
-  }
-
-  function bindEvents() {
-    document.querySelectorAll('[data-close]').forEach(function (btn) {
-      btn.addEventListener('click', function () { closeOverlay(btn.getAttribute('data-close')); });
-    });
-    document.querySelectorAll('.overlay').forEach(function (ov) {
-      ov.addEventListener('click', function (e) { if (e.target === ov) closeOverlay(ov.id); });
-    });
-
-    document.getElementById('selCurrentUser').addEventListener('change', function () {
-      state.currentUser = this.value;
-      saveUser();
-      renderAll();
-    });
-    document.getElementById('toggleMine').addEventListener('click', function () {
-      if (!state.currentUser) { showToast('Selecione "Você é" primeiro.'); return; }
-      state.onlyMine = !state.onlyMine;
-      this.classList.toggle('active', state.onlyMine);
-      renderAll();
-    });
-    document.getElementById('selFilterColab').addEventListener('change', function () {
-      state.filterColaborador = this.value;
-      renderAll();
-    });
-    document.getElementById('searchInput').addEventListener('input', function () {
-      state.search = this.value;
-      renderBoard(); renderStats();
-    });
-
-    // Contact modal actions
-    document.getElementById('btnSaveContact').addEventListener('click', function () {
-      var id = state.activeContactId;
-      updateContact(id, {
-        status: document.getElementById('cStatus').value,
-        colaborador: document.getElementById('cColab').value,
-        telefone: document.getElementById('cPhone').value.trim(),
-        email: document.getElementById('cEmail').value.trim()
-      });
-      ensureColaborador(document.getElementById('cColab').value);
-      renderAll();
-      closeOverlay('overlayContact');
-      showToast('Contato atualizado.');
-    });
-    document.getElementById('btnDeleteContact').addEventListener('click', function () {
-      if (!confirm('Excluir este contato definitivamente?')) return;
-      deleteContact(state.activeContactId);
-      renderAll();
-      closeOverlay('overlayContact');
-      showToast('Contato excluído.');
-    });
-    document.getElementById('btnAddNote').addEventListener('click', function () {
-      var txt = document.getElementById('noteInput').value.trim();
-      if (!txt) return;
-      var c = state.contacts.find(function (x) { return x.id === state.activeContactId; });
-      if (!c) return;
-      c.notas = c.notas || [];
-      c.notas.push({ texto: txt, data: nowISO(), autor: state.currentUser || 'Sem autor' });
-      c.atualizado_em = nowISO();
-      saveContacts();
-      renderNotes(c);
-      document.getElementById('noteInput').value = '';
-      renderBoard();
-    });
-
-    // New contact modal
-    document.getElementById('btnAddContact').addEventListener('click', function () {
-      document.getElementById('nNome').value = '';
-      document.getElementById('nFone').value = '';
-      document.getElementById('nEmail').value = '';
-      renderSelects();
-      document.getElementById('nColab').value = state.currentUser || '';
-      openOverlay('overlayNew');
-    });
-    document.getElementById('btnSaveNew').addEventListener('click', function () {
-      var nome = document.getElementById('nNome').value.trim();
-      if (!nome) { showToast('Informe o nome do contato.'); return; }
-      var colab = document.getElementById('nColab').value;
-      var contact = {
-        id: uid(), nome: nome,
-        telefone: document.getElementById('nFone').value.trim(),
-        email: document.getElementById('nEmail').value.trim(),
-        status: 'nao_contatado', colaborador: colab, notas: [],
-        criado_em: nowISO(), atualizado_em: nowISO(), meta: {}
-      };
-      state.contacts.push(contact);
-      ensureColaborador(colab);
-      saveContacts();
-      renderAll();
-      closeOverlay('overlayNew');
-      showToast('Contato adicionado.');
-    });
-
-    // Import CSV modal
-    document.getElementById('btnImport').addEventListener('click', function () {
-      document.getElementById('importSummary').textContent = '';
-      document.getElementById('iFile').value = '';
-      renderSelects();
-      document.getElementById('iColab').value = state.currentUser || '';
-      openOverlay('overlayImport');
-    });
-    document.getElementById('iFile').addEventListener('change', function (e) {
-      var file = e.target.files[0];
-      if (!file) return;
-      var reader = new FileReader();
-      reader.onload = function (ev) {
-        var result = parseCSV(ev.target.result);
-        if (result.error) {
-          document.getElementById('importSummary').innerHTML = '<span style="color:#DC2626;">' + esc(result.error) + '</span>';
-          return;
-        }
-        var colab = document.getElementById('iColab').value;
-        var r = importRows(result.rows, colab);
-        document.getElementById('importSummary').innerHTML =
-          '<span style="color:#059669;">' + r.added + ' contato(s) importado(s).</span>' +
-          (r.skipped ? ' <span style="color:#6B7280;">' + r.skipped + ' duplicado(s) ignorado(s).</span>' : '');
-        renderAll();
-        showToast(r.added + ' contato(s) importado(s) com sucesso.');
-      };
-      reader.readAsText(file, 'UTF-8');
-    });
-
-    // Colaboradores modal
-    document.getElementById('btnManageColab').addEventListener('click', function () {
-      renderColabList();
-      document.getElementById('newColabName').value = '';
-      openOverlay('overlayColab');
-    });
-    document.getElementById('btnAddColab').addEventListener('click', function () {
-      var name = document.getElementById('newColabName').value.trim();
-      if (!name) return;
-      ensureColaborador(name);
-      document.getElementById('newColabName').value = '';
-      renderColabList();
-      renderSelects();
-    });
-
-    // Export CSV
-    document.getElementById('btnExport').addEventListener('click', exportCSV);
-  }
-
-  function renderColabList() {
-    var html = state.colaboradores.map(function (c) {
-      var count = state.contacts.filter(function (x) { return x.colaborador === c; }).length;
-      return '<div style="display:flex;align-items:center;justify-content:space-between;background:var(--bg);border-radius:7px;padding:7px 10px;font-size:13px;">' +
-        '<span>' + esc(c) + ' <span style="color:var(--text-soft);font-size:11.5px;">(' + count + ' contatos)</span></span>' +
-        '<button class="btn-danger btn-sm" data-remove-colab="' + esc(c) + '">Remover</button>' +
-      '</div>';
-    }).join('') || '<div style="font-size:12.5px;color:var(--text-soft);">Nenhum colaborador cadastrado ainda.</div>';
-    document.getElementById('colabList').innerHTML = html;
-    document.querySelectorAll('[data-remove-colab]').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        var name = btn.getAttribute('data-remove-colab');
-        state.colaboradores = state.colaboradores.filter(function (c) { return c !== name; });
-        saveColaboradores();
-        if (state.currentUser === name) { state.currentUser = ''; saveUser(); }
-        renderColabList();
-        renderSelects();
-        renderAll();
-      });
-    });
-  }
-
-  function exportCSV() {
-    var rows = [['Nome', 'Telefone', 'Email', 'Status', 'Responsavel', 'Curso', 'Polo', 'Tipo', 'Ultima_Atualizacao', 'Anotacoes']];
-    state.contacts.forEach(function (c) {
-      var statusLabel = (STATUS_MAP[c.status] || {}).label || c.status;
-      var notas = (c.notas || []).map(function (n) { return n.texto; }).join(' | ');
-      rows.push([c.nome, c.telefone, c.email, statusLabel, c.colaborador, c.meta && c.meta.curso, c.meta && c.meta.polo, c.meta && c.meta.tipo, fmtDate(c.atualizado_em), notas]);
-    });
-    var csv = rows.map(function (r) {
-      return r.map(function (cell) {
-        var v = (cell === undefined || cell === null) ? '' : String(cell);
-        if (v.indexOf(',') !== -1 || v.indexOf('"') !== -1 || v.indexOf('\n') !== -1) {
-          v = '"' + v.replace(/"/g, '""') + '"';
-        }
-        return v;
-      }).join(',');
-    }).join('\n');
-    var blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement('a');
-    a.href = url;
-    a.download = 'crm_contatos_' + new Date().toISOString().slice(0, 10) + '.csv';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  }
-
-  init();
-})();
-</script>
+<script src="Script.js"></script>
 </body>
 </html>
