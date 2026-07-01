@@ -1,51 +1,109 @@
-# CRM Rematrícula — com login e Supabase
+# CRM · Follow-up de Rematrícula
 
-Este pacote tem 3 arquivos:
-- `index.html` → o sistema (login/cadastro + quadro Kanban + tabela geral)
-- `schema.sql` → o banco de dados (tabelas + permissões)
-- este guia
+Sistema simples de acompanhamento de contatos (kanban) para follow-up de rematrícula de alunos, com login de colaboradores, quadro por status, anotações, importação de CSV e exportação de relatório.
 
-## Passo 1 — Criar o projeto no Supabase
-1. Acesse **supabase.com** → crie uma conta → **New Project**.
-2. Anote a senha do banco que você definir (não precisa dela no código, mas guarde).
-3. Aguarde o projeto terminar de provisionar (1–2 minutos).
+## Stack
 
-## Passo 2 — Rodar o banco de dados
-1. No painel do projeto, vá em **SQL Editor** → **New query**.
-2. Cole todo o conteúdo do arquivo `schema.sql` e clique em **Run**.
-3. Isso cria as 3 tabelas (`profiles`, `contacts`, `notes`), as regras de permissão (RLS) e o gatilho que cria o perfil automaticamente quando alguém se cadastra.
+- **Frontend**: HTML + CSS + JS puro (sem build), usando `@supabase/supabase-js` via CDN
+- **Backend/DB/Auth**: Supabase (Postgres + Auth + RLS)
 
-## Passo 3 — Pegar as chaves da API
-1. Vá em **Project Settings → API**.
-2. Copie a **Project URL** e a **anon public key**.
-3. Abra `index.html`, procure por:
-   ```js
-   var SUPABASE_URL = 'https://SEU-PROJETO.supabase.co';
-   var SUPABASE_ANON_KEY = 'SUA_CHAVE_ANON_PUBLICA';
-   ```
-   e substitua pelos valores do seu projeto.
+## Estrutura de arquivos
 
-## Passo 4 — (Recomendado) Desligar a confirmação de e-mail
-Como é um sistema interno da equipe, o mais prático é não exigir confirmação de e-mail:
-- Vá em **Authentication → Providers → Email** e desative "Confirm email".
-- Se preferir manter a confirmação, cada colaborador vai precisar clicar no link que chega por e-mail antes do primeiro login.
+```
+index.html    -> tela e estrutura da aplicação
+Style.css     -> estilos
+Script.js     -> lógica (auth, CRUD, kanban, import/export)
+schema.sql    -> schema do banco (tabelas, triggers, RLS)
+```
 
-## Passo 5 — Abrir o sistema e criar sua conta (administrador)
-1. Abra o `index.html` no navegador (pode hospedar em qualquer lugar: GitHub Pages, Netlify, Vercel, ou até localmente).
-2. Clique em **Criar conta**, cadastre-se com seu nome, e-mail e senha.
-3. Volte ao **SQL Editor** do Supabase e rode (trocando pelo seu e-mail):
-   ```sql
-   update public.profiles set role = 'admin' where email = 'seu-email@uniasselvi.com.br';
-   ```
-4. Faça logout e login de novo — agora sua conta é administradora.
+## 1. Criar o projeto no Supabase
 
-## Como funcionam as permissões
-- **Colaborador comum**: no "Meu quadro" só vê e edita (arrasta, muda status, anota) os contatos atribuídos a ele. Na aba **"Todos os atendimentos"** vê uma tabela com os contatos de todo mundo, mas sem poder editar — só consultar.
-- **Administrador (você)**: o "Quadro (todos)" já mostra os contatos de todos os colaboradores, com edição liberada, incluindo reatribuir o responsável e ler/adicionar anotações em qualquer contato.
-- A importação de CSV: colaboradores comuns só importam para si mesmos; o administrador pode escolher para quem atribuir.
-- Isso tudo é garantido no banco (Row Level Security), não só na tela — mesmo que alguém tente burlar a interface, o Supabase bloqueia a edição/exclusão de contatos que não são dele.
+1. Acesse [supabase.com](https://supabase.com) e crie um novo projeto (plano free).
+2. Vá em **SQL Editor** e cole o conteúdo de `schema.sql`. Rode o script.
+   - Ele cria as tabelas `profiles`, `contacts` e `notes`.
+   - Cria a trigger que gera automaticamente um `profile` quando alguém se cadastra.
+   - Ativa Row Level Security (RLS) com as regras de permissão descritas abaixo.
+3. Vá em **Project Settings > API** e copie:
+   - `Project URL`
+   - `anon public key`
 
-## Próximos passos possíveis
-- Hospedar o `index.html` em um link fixo (Netlify/Vercel são gratuitos e simples).
-- Trocar a senha do banco periodicamente e nunca compartilhar a "service role key" (só use a anon public key no front-end).
-- Se quiser, dá pra adicionar recuperação de senha, edição de nome do colaborador, ou promover/rebaixar admins pela própria tela (hoje isso é feito por SQL, propositalmente, para manter o controle nas suas mãos).
+## 2. Configurar o frontend
+
+Abra `Script.js` e edite o topo do arquivo:
+
+```js
+var SUPABASE_URL = 'https://SEU-PROJETO.supabase.co';
+var SUPABASE_ANON_KEY = 'SUA_CHAVE_ANON_PUBLICA';
+```
+
+## 3. Criar o primeiro usuário administrador
+
+1. Abra o `index.html` no navegador (ou publique — veja seção de deploy).
+2. Clique em **Criar conta**, preencha nome/email/senha.
+3. Se a confirmação de email estiver ativada no Supabase (padrão), confirme o email antes de logar.
+4. No **SQL Editor** do Supabase, promova esse usuário a admin:
+
+```sql
+update public.profiles set role = 'admin' where email = 'seu-email@exemplo.com';
+```
+
+Colaboradores adicionais podem se cadastrar normalmente pela tela de login; por padrão eles entram como `colaborador` (só enxergam e editam os próprios contatos). Só um `admin` consegue ver/editar tudo e reatribuir responsáveis.
+
+> Dica: em **Authentication > Settings** do Supabase, você pode desativar a confirmação por email durante os testes, para logar na hora.
+
+## 4. Modelo de dados
+
+### `profiles`
+| coluna    | tipo      | descrição                                  |
+|-----------|-----------|---------------------------------------------|
+| id        | uuid (PK) | mesmo id do `auth.users`                    |
+| nome      | text      | nome exibido                                |
+| email     | text      | email do usuário                            |
+| role      | text      | `admin` ou `colaborador`                    |
+| criado_em | timestamptz | data de criação                          |
+
+### `contacts`
+| coluna         | tipo      | descrição                                          |
+|----------------|-----------|-----------------------------------------------------|
+| id             | uuid (PK) | identificador do contato                             |
+| nome           | text      | nome do aluno/lead                                   |
+| telefone       | text      | telefone (usado em link `tel:` e WhatsApp)           |
+| email          | text      | email (usado em link `mailto:`)                      |
+| status         | text      | uma das 7 colunas do kanban (veja abaixo)             |
+| colaborador_id | uuid (FK) | responsável pelo contato (`profiles.id`)             |
+| meta           | jsonb     | `curso`, `polo`, `tipo`, `status_aluno`, `turma`, `codigo_aluno` — vindos da importação CSV |
+| criado_em      | timestamptz | data de criação                                    |
+| atualizado_em  | timestamptz | atualizado automaticamente por trigger a cada UPDATE |
+
+Status possíveis: `nao_contatado`, `contato_realizado`, `sem_resposta`, `retornou_positivo`, `retornou_negativo`, `rematriculado`, `perdido`.
+
+### `notes`
+| coluna     | tipo      | descrição                                |
+|------------|-----------|---------------------------------------------|
+| id         | uuid (PK) | identificador da anotação                   |
+| contact_id | uuid (FK) | contato relacionado (`contacts.id`)         |
+| autor_id   | uuid (FK) | quem escreveu (`profiles.id`)               |
+| autor_nome | text      | nome do autor no momento da anotação        |
+| texto      | text      | conteúdo da anotação                        |
+| criado_em  | timestamptz | data/hora                                 |
+
+## 5. Regras de permissão (RLS)
+
+- **Leitura**: todo usuário autenticado enxerga todos os `profiles`, `contacts` e `notes` (necessário para o admin ter visão geral e para o quadro "Todos os atendimentos").
+- **Contatos**: um colaborador só pode **editar/excluir** contatos onde `colaborador_id = seu próprio id`. Um `admin` pode editar/excluir qualquer contato, inclusive reatribuir o responsável.
+- **Criação de contato**: qualquer autenticado pode criar; se não for admin, só pode criar atribuído a si mesmo (ou sem responsável).
+- **Anotações**: só quem tem permissão de editar o contato (dono ou admin) pode adicionar anotações nele.
+- **Perfis**: ninguém se autopromove a admin pela aplicação — isso só é feito manualmente via SQL Editor.
+
+## 6. Importação de CSV
+
+O botão **Importar CSV** aceita arquivos separados por vírgula, ponto-e-vírgula ou tabulação, com detecção automática de cabeçalhos (aceita variações como `NOME_ALUNO`, `FONE`, `EMAIL`, `NOME_CURSO`, `NOME_POLO`, etc.). Contatos duplicados (mesmo telefone ou email já cadastrado) são ignorados automaticamente.
+
+## 7. Deploy
+
+Como é um app 100% estático (HTML/CSS/JS), pode ser hospedado em qualquer serviço de arquivos estáticos:
+
+- **Vercel** / **Netlify**: arraste a pasta do projeto ou conecte um repositório Git.
+- **GitHub Pages**: publique os 3 arquivos (`index.html`, `Style.css`, `Script.js`) na branch de páginas.
+
+Nenhum backend próprio é necessário — toda a lógica de dados passa direto pelo Supabase (Postgres + Auth + RLS) a partir do navegador.
